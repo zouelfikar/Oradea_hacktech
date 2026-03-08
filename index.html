@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Airport's Passenger Experience Assistant</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Space+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --sky: #4DC8E8;
+            --sky-dark: #2AAFD0;
+            --sky-light: #7ADCF2;
+            --yellow: #F5C518;
+            --pink: #E8407A;
+            --green: #3BAF6A;
+            --navy: #1E2D6B;
+            --orange: #F07820;
+            --white: #FFFFFF;
+            --gray: #F0F4F6;
+            --text: #1A2340;
+            --text-muted: #5A7080;
+            --sans: 'Nunito', sans-serif;
+            --mono: 'Space Mono', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--sky);
+            font-family: var(--sans);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Subtle dot pattern overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            background-image: radial-gradient(circle, rgba(255, 255, 255, 0.12) 1px, transparent 1px);
+            background-size: 28px 28px;
+            pointer-events: none;
+        }
+
+        /* ── HEADER ── */
+        header {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 28px;
+            height: 64px;
+            background: var(--white);
+            border-bottom: 3px solid var(--sky);
+            flex-shrink: 0;
+            box-shadow: 0 2px 12px rgba(30, 45, 107, 0.08);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        /* Logo mark: split circle yellow+blue with plane */
+        .logo-mark {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(30, 45, 107, 0.2);
+        }
+
+        .logo-mark::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, var(--yellow) 50%, var(--sky) 50%);
+        }
+
+        .logo-mark svg {
+            position: absolute;
+            inset: 0;
+            margin: auto;
+            width: 22px;
+            height: 22px;
+            fill: white;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1;
+        }
+
+        .logo-text-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+        }
+
+        .logo-title {
+            font-weight: 900;
+            font-size: 14px;
+            color: var(--navy);
+            letter-spacing: -0.01em;
+            line-height: 1.1;
+        }
+
+        .logo-sub {
+            font-family: var(--mono);
+            font-size: 8px;
+            color: var(--sky-dark);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .badge {
+            font-family: var(--mono);
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            padding: 5px 12px;
+            border-radius: 999px;
+            background: var(--navy);
+            color: var(--white);
+        }
+
+        .status-pill {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            border-radius: 999px;
+            background: var(--green);
+            color: white;
+            font-family: var(--mono);
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .status-pill::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: white;
+            animation: blink 2s ease-in-out infinite;
+        }
+
+        @keyframes blink {
+
+            0%,
+            100% {
+                opacity: 1
+            }
+
+            50% {
+                opacity: 0.3
+            }
+        }
+
+        /* ── COLOR BAR (from brand color grid) ── */
+        .color-bar {
+            display: flex;
+            height: 5px;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 9;
+        }
+
+        .color-bar span {
+            flex: 1;
+        }
+
+        /* ── MAIN ── */
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+            z-index: 5;
+            max-width: 860px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* ── INTRO ── */
+        .intro {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            gap: 0;
+            padding: 20px;
+        }
+
+        .intro-title {
+            font-size: 52px;
+            font-weight: 900;
+            line-height: 1.05;
+            letter-spacing: -0.03em;
+            color: var(--white);
+            text-shadow: 0 3px 20px rgba(30, 45, 107, 0.2);
+        }
+
+        .intro-title em {
+            font-style: normal;
+            color: var(--yellow);
+            /* pill-shaped highlight behind the word */
+            background: var(--navy);
+            padding: 0 16px 4px;
+            border-radius: 999px;
+            display: inline-block;
+            margin: 4px 0;
+        }
+
+        .intro-title .airport-word {
+            color: var(--navy);
+            background: var(--white);
+            padding: 0 16px 4px;
+            border-radius: 999px;
+            display: inline-block;
+            margin: 4px 0;
+        }
+
+        /* ── MESSAGES ── */
+        .messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 0;
+            display: none;
+            flex-direction: column;
+            gap: 14px;
+            scroll-behavior: smooth;
+        }
+
+        .messages::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .messages::-webkit-scrollbar-thumb {
+            background: rgba(30, 45, 107, 0.2);
+            border-radius: 4px;
+        }
+
+        .msg {
+            display: flex;
+            gap: 10px;
+            animation: fadeUp 0.3s ease-out forwards;
+            opacity: 0;
+            align-items: flex-end;
+        }
+
+        .msg.user {
+            flex-direction: row-reverse;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(8px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        .avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 11px;
+            letter-spacing: 0.02em;
+        }
+
+        .msg.ai .avatar {
+            background: var(--navy);
+            color: var(--yellow);
+        }
+
+        .msg.user .avatar {
+            background: var(--yellow);
+            color: var(--navy);
+        }
+
+        .bubble {
+            max-width: 72%;
+            padding: 12px 16px;
+            font-size: 13.5px;
+            line-height: 1.7;
+            font-weight: 600;
+            border-radius: 18px;
+        }
+
+        .bubble.ai {
+            background: var(--white);
+            color: var(--text);
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 2px 10px rgba(30, 45, 107, 0.1);
+        }
+
+        .bubble.user {
+            background: var(--navy);
+            color: var(--white);
+            border-bottom-right-radius: 4px;
+        }
+
+        .bubble-tag {
+            font-family: var(--mono);
+            font-size: 8px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--sky-dark);
+            margin-bottom: 5px;
+            font-weight: 700;
+        }
+
+        .bubble b {
+            color: var(--navy);
+            font-weight: 900;
+        }
+
+        .bubble.user b {
+            color: var(--yellow);
+        }
+
+        .bubble ul {
+            padding-left: 16px;
+            margin: 5px 0;
+        }
+
+        .bubble li {
+            margin-bottom: 3px;
+        }
+
+        /* color accent strip on AI bubble */
+        .bubble.ai {
+            border-left: 4px solid var(--sky);
+        }
+
+        /* ── TYPING ── */
+        .typing {
+            display: none;
+            gap: 10px;
+            align-items: flex-end;
+        }
+
+        .typing-bub {
+            background: var(--white);
+            border-radius: 18px;
+            border-bottom-left-radius: 4px;
+            border-left: 4px solid var(--sky);
+            padding: 12px 18px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            box-shadow: 0 2px 10px rgba(30, 45, 107, 0.1);
+        }
+
+        .dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            animation: dotAnim 1.2s ease-in-out infinite;
+        }
+
+        .dot:nth-child(1) {
+            background: var(--sky);
+        }
+
+        .dot:nth-child(2) {
+            background: var(--pink);
+            animation-delay: .2s;
+        }
+
+        .dot:nth-child(3) {
+            background: var(--yellow);
+            animation-delay: .4s;
+        }
+
+        @keyframes dotAnim {
+
+            0%,
+            60%,
+            100% {
+                opacity: .3;
+                transform: translateY(0)
+            }
+
+            30% {
+                opacity: 1;
+                transform: translateY(-5px)
+            }
+        }
+
+        /* ── INPUT AREA ── */
+        .input-area {
+            padding: 12px 0 16px;
+            flex-shrink: 0;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 8px;
+            align-items: flex-end;
+        }
+
+        .input-wrap {
+            flex: 1;
+            background: var(--white);
+            border-radius: 999px;
+            border: 2.5px solid transparent;
+            box-shadow: 0 2px 12px rgba(30, 45, 107, 0.12);
+            transition: border-color 0.2s, box-shadow 0.2s;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-wrap:focus-within {
+            border-color: var(--navy);
+            box-shadow: 0 2px 16px rgba(30, 45, 107, 0.2);
+        }
+
+        textarea {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--text);
+            font-family: var(--sans);
+            font-size: 14px;
+            font-weight: 600;
+            padding: 12px 20px;
+            resize: none;
+            min-height: 46px;
+            max-height: 120px;
+            line-height: 1.5;
+            border-radius: 999px;
+        }
+
+        textarea::placeholder {
+            color: #9BBAC8;
+            font-weight: 600;
+        }
+
+        .send-btn {
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            background: var(--navy);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
+            flex-shrink: 0;
+            box-shadow: 0 2px 10px rgba(30, 45, 107, 0.3);
+        }
+
+        .send-btn:hover {
+            background: var(--sky-dark);
+            transform: scale(1.05);
+        }
+
+        .send-btn:active {
+            transform: scale(0.95);
+        }
+
+        .send-btn svg {
+            width: 16px;
+            height: 16px;
+            fill: white;
+        }
+
+        .input-hint {
+            font-family: var(--mono);
+            font-size: 9px;
+            color: rgba(255, 255, 255, 0.6);
+            letter-spacing: 0.08em;
+            margin-top: 6px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <header>
+        <div class="header-left">
+            <div class="logo-mark">
+                <svg viewBox="0 0 24 24">
+                    <path
+                        d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z" />
+                </svg>
+            </div>
+            <div class="logo-text-wrap">
+                <div class="logo-title">Airport's Passenger Experience Assistant</div>
+                <div class="logo-sub">Oradea International Airport · OMR</div>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="status-pill">Live</div>
+            <div class="badge">HackTech Oradea Airport</div>
+        </div>
+    </header>
+
+    <!-- COLOR BAR -->
+    <div class="color-bar">
+        <span style="background:#F5C518"></span>
+        <span style="background:#4DC8E8"></span>
+        <span style="background:#3BAF6A"></span>
+        <span style="background:#E8407A"></span>
+        <span style="background:#1E2D6B"></span>
+        <span style="background:#F07820"></span>
+    </div>
+
+    <!-- MAIN -->
+    <main>
+        <div class="intro" id="intro">
+            <h1 class="intro-title">
+                Elevate Every<br>
+                <em>Experience</em><br>
+                Through Your <span class="airport-word">Airport</span>
+            </h1>
+        </div>
+
+        <div class="messages" id="messages"></div>
+
+        <div class="typing" id="typing">
+            <div class="avatar"
+                style="background:var(--navy);color:var(--yellow);width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:11px;flex-shrink:0;">
+                AI</div>
+            <div class="typing-bub">
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+            </div>
+        </div>
+
+        <div class="input-area">
+            <div class="input-row">
+                <div class="input-wrap">
+                    <textarea id="inp" rows="1"
+                        placeholder="Ask about passenger experience, wayfinding, staff training…"
+                        onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+                </div>
+                <button class="send-btn" onclick="send()">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
+                    </svg>
+                </button>
+            </div>
+            <div class="input-hint">ENTER TO SEND · SHIFT+ENTER NEW LINE</div>
+        </div>
+    </main>
+
+    <script src="config.js"></script>
+    <script>
+        const SYS = `You are PassengerIQ Copilot, an expert AI advisor for regional airport staff in Romania, specializing in passenger experience optimization.
+
+You help airport directors, managers, and staff understand, diagnose, and improve passenger satisfaction using evidence-based research from Oradea International Airport (10 qualitative interviews, participatory workshops, journey mapping) combined with 20+ academic papers and a proven 5-phase research framework.
+
+CORE KNOWLEDGE BASE:
+- Oradea Airport: 8/10 passengers cited post-security wayfinding confusion (stress 8.3/10, satisfaction 3.8/10)
+- 7/10 mentioned staff unavailability and inconsistency
+- 6/10 mentioned WiFi issues and seating discomfort
+- Workshop top priorities: staff alignment (#1), service consistency (#2)
+- Academic frameworks: Augé Non-Places, Norman Design Principles, Passini Wayfinding, SERVQUAL
+- Solutions: Quick wins €0-1K (floor decals, staff repositioning, briefings, WiFi signs) | Medium €5-15K (wayfinding system, training, charging) | Long €25K+ (kiosks, seating, full program)
+- Staff training: 3-Second Rule, 5 Key Facts, Point+Explain+Estimate, LEARA method
+- 5-phase framework: Desk Research → Interviews → Analysis → Journey Map → Prioritization
+- Comparable airports: Ljubljana (-40% wayfinding complaints with €8K signage), Innsbruck ("Ask me" vests), Salzburg (daily feedback loops)
+
+RULES:
+1. Evidence-first: cite specific findings ("8/10 passengers mentioned...")
+2. Always include concrete next steps
+3. Suggest quick wins first, then tiered solutions
+4. Keep responses concise and scannable — short paragraphs, bullet points
+5. Bold key numbers and key concepts using **bold**
+6. Never invent statistics not in the knowledge base
+
+Tone: Warm, professional, energetic. Structure: Answer → Evidence → Action.`;
+
+        let history = [];
+        let busy = false;
+
+        function autoResize(el) {
+            el.style.height = 'auto';
+            el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+        }
+
+        function handleKey(e) {
+            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
+        }
+
+        function showIntro(v) {
+            document.getElementById('intro').style.display = v ? 'flex' : 'none';
+            document.getElementById('messages').style.display = v ? 'none' : 'flex';
+        }
+
+        function addMsg(role, text) {
+            showIntro(false);
+            const el = document.createElement('div');
+            el.className = 'msg ' + role;
+            el.innerHTML =
+                '<div class="avatar">' + (role === 'ai' ? 'AI' : 'YOU') + '</div>' +
+                '<div class="bubble ' + role + '">' +
+                (role === 'ai' ? '<div class="bubble-tag">PassengerIQ · Oradea Airport</div>' : '') +
+                fmt(text) + '</div>';
+            document.getElementById('messages').appendChild(el);
+            document.getElementById('messages').scrollTop = 99999;
+        }
+
+        function fmt(t) {
+            return t
+                .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
+                .replace(/^[•\-] (.+)$/gm, '<li>$1</li>')
+                .replace(/(<li>[\s\S]*?<\/li>)/g, '<ul>$1</ul>')
+                .replace(/<\/ul>\s*<ul>/g, '')
+                .replace(/\n\n/g, '<br><br>')
+                .replace(/\n/g, '<br>');
+        }
+
+        function setTyping(v) {
+            document.getElementById('typing').style.display = v ? 'flex' : 'none';
+            if (v) document.getElementById('messages').scrollTop = 99999;
+        }
+
+        async function send() {
+            if (busy) return;
+            const inp = document.getElementById('inp');
+            const txt = inp.value.trim();
+            if (!txt) return;
+            inp.value = ''; inp.style.height = 'auto';
+            busy = true;
+            addMsg('user', txt);
+            history.push({ role: 'user', content: txt });
+            setTyping(true);
+            try {
+                const res = await fetch('https://api.anthropic.com/v1/messages', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'anthropic-version': '2023-06-01',
+                        'anthropic-dangerous-direct-browser-access': 'true',
+                        'x-api-key': ANTHROPIC_API_KEY
+                    },
+                    body: JSON.stringify({
+                        model: 'claude-sonnet-4-20250514',
+                        max_tokens: 1000,
+                        system: SYS,
+                        messages: history
+                    })
+                });
+                const data = await res.json();
+                setTyping(false);
+                if (!res.ok || data.error) {
+                    throw new Error(data.error?.message || `HTTP error ${res.status}`);
+                }
+                const reply = data.content?.[0]?.text || 'Unable to get a response. Please try again.';
+                history.push({ role: 'assistant', content: reply });
+                addMsg('ai', reply);
+            } catch (error) {
+                setTyping(false);
+                addMsg('ai', `**Error:** ${error.message || 'Connection failed'}. Please try again.`);
+            }
+            busy = false;
+        }
+    </script>
+</body>
+
+</html>
